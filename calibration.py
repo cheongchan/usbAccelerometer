@@ -5,16 +5,18 @@
 ##################################################
 #pySerial wrapper for serial communication
 import serial
+import serial.tools.list_ports
 #import regular expression to parse numbers
 import re
 
 #Get the port that has the arduino and accelerometer connected
 def getPort():
-	ser = serial.Serial('/dev/tty.usbmodemfd121', 9600, timeout=1)
+	port = serial.tools.list_ports.comports()[-1][0]
+	ser = serial.Serial(port, 9600, timeout=1)
 	return ser
 
-#Get a set of values from the accelerometer
-def zFaceDown(ser):
+#Get a set of values from the accelerometer in array split by \r\n
+def readArray(ser):
 	data = ser.read(100)
 	splitted = re.split("\r\n+",data)
 	return splitted
@@ -50,5 +52,5 @@ def parseDataToXYZ(accelerationRawData):
 
 def setupAccelerometer():
 	ser = getPort()
-	data = zFaceDown(ser)
+	data = readArray(ser)
 	parseDataToXYZ(data)
