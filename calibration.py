@@ -17,7 +17,7 @@ def getPort():
 
 #Get a set of values from the accelerometer in array split by \r\n
 def readArray(ser):
-	data = ser.read(100)
+	data = ser.read(200)
 	splitted = re.split("\r\n+",data)
 	return splitted
 
@@ -38,19 +38,34 @@ def parseDataToXYZ(accelerationRawData):
 				if axis == 'X':
 					accelerationValue = re.search('\d+',accelerationRawData[x]).group(0)
 					xAccelerationValues.append(accelerationValue)
-					print(xAccelerationValues)
+					#print(xAccelerationValues)
 				elif axis == 'Y':
 					accelerationValue = re.search('\d+',accelerationRawData[x]).group(0)
 					yAccelerationValues.append(accelerationValue)
-					print(yAccelerationValues)
+					#print(yAccelerationValues)
 				elif axis == 'Z':
 					accelerationValue = re.search('\d+',accelerationRawData[x]).group(0)
 					zAccelerationValues.append(accelerationValue)
-					print(zAccelerationValues)					
+					#print(zAccelerationValues)					
 				else:
 					print("Did not match any axis!")
+	return [xAccelerationValues,yAccelerationValues,zAccelerationValues]
 
+#Calculate the mean acceleration from a sample of arrays of x,y,z measurements
+def meanValuesAxis(accelerations):
+	xAccelerationValues = accelerations[0]
+	yAccelerationValues = accelerations[1]
+	zAccelerationValues = accelerations[2]
+	meanAccelerationX = sum(map(int,xAccelerationValues))/len(xAccelerationValues)
+	meanAccelerationY = sum(map(int,yAccelerationValues))/len(yAccelerationValues)
+	meanAccelerationZ = sum(map(int,zAccelerationValues))/len(zAccelerationValues)
+	return [meanAccelerationX,meanAccelerationY,meanAccelerationZ]
+
+#function to calibrate the accelerometer
 def setupAccelerometer():
 	ser = getPort()
 	data = readArray(ser)
-	parseDataToXYZ(data)
+	accelerations = parseDataToXYZ(data)
+	mean = meanValuesAxis(accelerations)
+	print accelerations
+	print mean
