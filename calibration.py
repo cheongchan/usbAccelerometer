@@ -16,8 +16,8 @@ def getPort():
 	return ser
 
 #Get a set of values from the accelerometer in array split by \r\n
-def readArray(ser):
-	data = ser.read(200)
+def readArray(ser,characters):
+	data = ser.read(characters)
 	splitted = re.split("\r\n+",data)
 	return splitted
 
@@ -30,11 +30,11 @@ def parseDataToXYZ(accelerationRawData):
 	entries = len(accelerationRawData)
 	#Dont use the end entries as they are probably corrupted
 	for x in range(1,entries-1):
-		print(accelerationRawData[x])
+		#print(accelerationRawData[x])
 		if re.match('\w\:',accelerationRawData[x]):
 			if re.search('\d+',accelerationRawData[x]):
 				axis = re.match('\w',accelerationRawData[x]).group(0)
-				print(axis)
+				#print(axis)
 				if axis == 'X':
 					accelerationValue = re.search('\d+',accelerationRawData[x]).group(0)
 					xAccelerationValues.append(accelerationValue)
@@ -64,8 +64,9 @@ def meanValuesAxis(accelerations):
 #function to calibrate the accelerometer
 def setupAccelerometer():
 	ser = getPort()
-	data = readArray(ser)
+	data = readArray(ser,200)
 	accelerations = parseDataToXYZ(data)
 	mean = meanValuesAxis(accelerations)
 	print accelerations
 	print mean
+
